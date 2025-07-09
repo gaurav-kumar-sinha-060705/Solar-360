@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic[email] # pydantic[email] is needed for EmailStr
+python-jose[cryptography] # For JWT tokens
+passlib[bcrypt] # For password hashing
+python-multipart # Needed for OAuth2PasswordRequestForm
+# If you use python-dotenv for environment variables, add it:
+# python-dotenv

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar AI - Solar 360</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Link to your main CSS file -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Inline styles specific to this page (or move to style.css if preferred) -->
+    <style>
+        .tool-detail-section { padding-top: 140px; padding-bottom: 6rem; min-height: 80vh; }
+        .tool-detail-content { background: var(--card-bg); padding: 3rem; border-radius: 15px; max-width: 800px; margin: 0 auto; box-shadow: 0 5px 25px rgba(0,0,0,0.08); }
+        .tool-detail-content h1 { font-size: 2.8rem; color: var(--dark-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-weight: 700; }
+        /* Main icon is BLUE (primary) for Solar AI */
+        .tool-detail-content h1 .icon { color: var(--primary-color); font-size: 2.5rem; } 
+        .tool-detail-content .tool-subtitle { font-size: 1.2rem; color: var(--text-color); margin-bottom: 2.5rem; border-left: 4px solid var(--secondary-color); padding-left: 1rem; font-style: italic; }
+        .tool-detail-content .features-list { list-style: none; padding-left: 0; }
+        /* Checkmarks for blue-logo tools are GREEN */
+        .tool-detail-content .features-list li i { color: var(--accent-color); margin-right: 1rem; margin-top: 6px; }
+        .tool-detail-content .btn-back { margin-top: 2rem; }
+        .dark-mode .tool-detail-content { box-shadow: none; border: 1px solid #333; }
+
+        /* Specific styling for SolarAI results sub-sections */
+        #solar-ai-results h4 {
+            font-size: 1.3rem;
+            color: var(--dark-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        #solar-ai-results ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+        #solar-ai-results ul li {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        /* Strong text for blue-logo tools are GREEN */
+        #solar-ai-results ul li strong {
+            color: var(--accent-color);
+            margin-left: 0.5rem;
+        }
+        .dark-mode #solar-ai-results h4 {
+            border-color: #444;
+        }
+        .dark-mode #solar-ai-results ul li strong {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">SOLAR<span>360</span></a>
+            <div class="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="index.html#about">Our Vision</a></li>
+                    <li><a href="index.html#products">Ecosystem</a></li>
+                    <li><a href="index.html#tech">Technology</a></li>
+                </ul>
+                <div class="nav-controls">
+                    <button class="theme-switcher" id="theme-switcher" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="tool-detail-section">
+            <div class="container">
+                <div class="tool-detail-content">
+                    <h1><div class="icon"><i class="fas fa-brain"></i></div>Solar AI</h1>
+                    <p class="tool-subtitle">Our AI analyzes your location and roof area to recommend the optimal solar setup.</p>
+                    
+                    <h3>Analyze Your Solar Potential:</h3>
+                    <!-- The interactive form with its unique ID -->
+                    <form id="solar-ai-form" class="tool-form">
+                        <div class="form-group">
+                            <label for="pincode">Your 6-Digit Pincode:</label>
+                            <input type="text" id="pincode" name="pincode" pattern="[1-9][0-9]{5}" placeholder="e.g., 400001" required minlength="6" maxlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="roof-area">Available Roof Area (in sq. ft.):</label>
+                            <input type="number" id="roof-area" name="roof-area" placeholder="e.g., 500" required min="50">
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Analyze Potential</button>
+                    </form>
+
+                    <!-- The container for results, with its unique ID -->
+                    <div id="solar-ai-results" class="tool-results">
+                        <p>Enter your pincode and available roof area above and click "Analyze Potential" to get AI-driven recommendations.</p>
+                    </div>
+
+                    <!-- Button is SECONDARY (green), based on the new consistent rule -->
+                    <a href="index.html#products" class="btn btn-secondary btn-back">Back to Ecosystem</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 Solar 360. All Rights Reserved. Making solar smarter, not harder.</p>
+        </div>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html>
