@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const apiUrl = `${API_TOOLS_BASE_URL}/green-cell?capacity_ah=${capacity}¤t_cycles=${cycles}&avg_dod_percent=${dod}`;
+            const apiUrl = `${API_TOOLS_BASE_URL}/green-cell?capacity_ah=${capacity}&current_cycles=${cycles}&avg_dod_percent=${dod}`;
             try {
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
