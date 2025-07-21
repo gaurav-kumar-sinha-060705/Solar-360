@@ -30,12 +30,7 @@ Website/
 │   ├── solar_pay.html
 │   ├── style.css
 │   ├── script.js
-│   └── assets/
-│       ├── images/
-│       └── icons/
 │
-├── venv/                            # Python virtual environment
-│   └── ...
 │
 └── readme.txt                        # Project documentation
 
