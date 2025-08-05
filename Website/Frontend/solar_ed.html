@@ -10,115 +10,31 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Link to your main CSS file -->
     <link rel="stylesheet" href="Style.css">
     
-    <!-- Inline styles specific to this page (or move to style.css if preferred) -->
     <style>
         .tool-detail-section { padding-top: 140px; padding-bottom: 6rem; min-height: 80vh; }
         .tool-detail-content { background: var(--card-bg); padding: 3rem; border-radius: 15px; max-width: 800px; margin: 0 auto; box-shadow: 0 5px 25px rgba(0,0,0,0.08); }
         .tool-detail-content h1 { font-size: 2.8rem; color: var(--dark-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-weight: 700; }
-        /* Main icon color: SolarEd is GREEN in the Ecosystem grid */
         .tool-detail-content h1 .icon { color: var(--accent-color); font-size: 2.5rem; } 
         .tool-detail-content .tool-subtitle { font-size: 1.2rem; color: var(--text-color); margin-bottom: 2.5rem; border-left: 4px solid var(--secondary-color); padding-left: 1rem; font-style: italic; }
-        .tool-detail-content .features-list { list-style: none; padding-left: 0; }
-        .tool-detail-content .features-list li { margin-bottom: 1.2rem; display: flex; align-items: flex-start; font-size: 1.05rem; }
-        /* Checkmarks are BLUE (primary) */
-        .tool-detail-content .features-list li i { color: var(--primary-color); margin-right: 1rem; margin-top: 6px; }
-        .tool-detail-content .btn-back { margin-top: 2rem; }
         .dark-mode .tool-detail-content { box-shadow: none; border: 1px solid #333; }
 
-        /* SolarEd specific styles (from original request/hints) */
-        .topic-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 2rem;
-            justify-content: center; /* Center buttons */
-        }
-        .topic-btn {
-            background-color: var(--light-color); /* Lighter background for buttons */
-            color: var(--dark-color);
-            border: 1px solid var(--primary-color); /* Buttons are BLUE themed */
-            padding: 0.7rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .topic-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-        }
-        .topic-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
-            transform: translateY(-2px);
-        }
-        .solar-ed-content {
-            margin-top: 2rem;
-            padding: 2rem;
-            background-color: #f7faff; /* Very light blue background */
-            border: 1px solid var(--primary-color); /* Blue border */
-            border-radius: 10px;
-            color: var(--text-color);
-            font-size: 1.05rem;
-            line-height: 1.7;
-            min-height: 150px; /* Ensure space for content */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Vertically center initial text */
-            align-items: center; /* Horizontally center initial text */
-            text-align: center;
-        }
-        .solar-ed-content h3 {
-            font-size: 1.8rem;
-            color: var(--primary-color); /* Blue for headings */
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        .solar-ed-content p {
-            margin-bottom: 1rem;
-            text-align: justify; /* Justify text for better readability */
-        }
-        .solar-ed-content a {
-            color: var(--primary-color); /* Blue for links */
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 1rem;
-        }
-        .solar-ed-content a:hover {
-            text-decoration: underline;
-        }
+        .topic-selector { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 2rem; justify-content: center; }
+        .topic-btn { background-color: var(--light-color); color: var(--dark-color); border: 1px solid var(--primary-color); padding: 0.7rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .topic-btn:hover { background-color: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
+        .topic-btn.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4); transform: translateY(-2px); }
+        
+        .solar-ed-content { margin-top: 2rem; padding: 2rem; background-color: #f7faff; border: 1px solid var(--primary-color); border-radius: 10px; color: var(--text-color); font-size: 1.05rem; line-height: 1.7; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .solar-ed-content h3 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        .solar-ed-content p { margin-bottom: 1rem; text-align: justify; }
+        .solar-ed-content h4 { font-size: 1.2rem; color: var(--text-color); font-weight: 400; }
+        .solar-ed-content a { color: var(--primary-color); text-decoration: none; font-weight: 600; margin-top: 1rem; }
+        .solar-ed-content a:hover { text-decoration: underline; }
 
-        /* Dark mode for SolarEd */
-        .dark-mode .topic-btn {
-            background-color: #333;
-            color: var(--dark-color);
-            border-color: #555;
-            box-shadow: none;
-        }
-        .dark-mode .topic-btn:hover,
-        .dark-mode .topic-btn.active {
-            background-color: var(--primary-color);
-            color: var(--dark-color);
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-        }
-        .dark-mode .solar-ed-content {
-            background-color: #2a2a3a;
-            border-color: var(--primary-color);
-            color: var(--text-color);
-        }
-        .dark-mode .solar-ed-content h3 {
-            color: var(--primary-color);
-        }
-        .dark-mode .solar-ed-content a {
-            color: var(--primary-color);
-        }
+        .dark-mode .topic-btn { background-color: #333; color: var(--dark-color); border-color: #555; box-shadow: none; }
+        .dark-mode .topic-btn:hover, .dark-mode .topic-btn.active { background-color: var(--primary-color); color: var(--dark-color); border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); }
+        .dark-mode .solar-ed-content { background-color: #2a2a3a; border-color: var(--primary-color); color: var(--text-color); }
     </style>
 </head>
 <body>
@@ -147,7 +63,6 @@
                     <p class="tool-subtitle">Your simplified guide to understanding solar energy in India. Select a topic below to learn more.</p>
                     
                     <h3>Explore Topics:</h3>
-                    <!-- The topic selector with buttons that script.js will find -->
                     <div class="topic-selector">
                         <button class="topic-btn" data-topic="subsidies">Understanding Subsidies</button>
                         <button class="topic-btn" data-topic="net_metering">What is Net Metering?</button>
@@ -156,13 +71,13 @@
                         <button class="topic-btn" data-topic="maintenance_tips">Maintenance Tips</button>
                     </div>
 
-                    <!-- The container for content, with its unique ID -->
+                    <!-- This is the container for content. JS will fill this. -->
                     <div id="solar-ed-content" class="solar-ed-content">
-                        <p>Please select a topic to get started.</p>
+                        <!-- The default message will be populated by script.js -->
+                        <h4>Please select a topic from the buttons above to learn more.</h4>
                     </div>
 
-                    <!-- Button is PRIMARY (blue), based on the new consistent rule -->
-                    <a href="index.html#products" class="btn btn-primary btn-back">Back to Ecosystem</a>
+                    <a href="index.html#products" class="btn btn-primary" style="margin-top: 2rem;">Back to Ecosystem</a>
                 </div>
             </div>
         </section>
@@ -170,11 +85,10 @@
 
     <footer class="footer">
         <div class="container">
-            <p>© 2024 Solar 360. All Rights Reserved. Making solar smarter, not harder.</p>
+            <p>© 2024 Solar 360. All Rights Reserved.</p>
         </div>
     </footer>
     
     <script src="Script.js"></script>
 </body>
-
 </html>
