@@ -31,7 +31,8 @@ Website/
 │   ├── style.css
 │   ├── script.js
 │
-│
+│── vercel.json
+
 └── readme.txt                        # Project documentation
 
 
@@ -103,3 +104,4 @@ Includes policy updates and subsidy info.
 📱 Mobile-friendly and scalable
 
 This is Solar360: Smarter Energy, Not Harder.
+
