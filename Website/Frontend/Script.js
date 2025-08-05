@@ -1,39 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================================
-    // SECTION 1: CORE UI LOGIC (THEME, PRELOADER, MODAL, CHATBOT)
-    // This code handles the general look and feel of the site.
+    // SECTION 1: CORE UI & INTERACTIVITY
     // ===================================================================
 
-    // --- THEME SWITCHER LOGIC ---
+    // --- THEME SWITCHER ---
     const themeSwitcher = document.getElementById('theme-switcher');
     const body = document.body;
-
     if (themeSwitcher) {
         const applyTheme = (theme) => {
             const themeIcon = themeSwitcher.querySelector('i');
             if (theme === 'dark') {
                 body.classList.add('dark-mode');
-                if (themeIcon) {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                }
+                if (themeIcon) { themeIcon.classList.remove('fa-moon'); themeIcon.classList.add('fa-sun'); }
                 localStorage.setItem('theme', 'dark');
             } else {
                 body.classList.remove('dark-mode');
-                if (themeIcon) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
+                if (themeIcon) { themeIcon.classList.remove('fa-sun'); themeIcon.classList.add('fa-moon'); }
                 localStorage.setItem('theme', 'light');
             }
         };
-
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
-
         themeSwitcher.addEventListener('click', () => {
-            const currentTheme = localStorage.getItem('theme');
+            const currentTheme = localStorage.getItem('theme') || 'light';
             applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
     }
@@ -41,40 +31,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- PRELOADER ---
     const preloader = document.querySelector('.preloader');
     if (preloader) {
-        // Check if preloader has been shown in this session
         if (sessionStorage.getItem('preloaderShown')) {
-            preloader.style.display = 'none'; // Hide immediately if already shown
+            preloader.style.display = 'none';
         } else {
-            sessionStorage.setItem('preloaderShown', 'true'); // Mark as shown for this session
-            // Hide after the animation duration (4.5s based on your CSS)
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 4500); // This matches your CSS animation duration + fadeOutBackground
+            sessionStorage.setItem('preloaderShown', 'true');
+            setTimeout(() => { preloader.style.display = 'none'; }, 4500);
         }
     }
 
-
-    // --- AUTH MODAL LOGIC (UPDATED) ---
+    // --- AUTH MODAL UI ---
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
-        const signInBtn = document.getElementById('signin-btn'); // For navbar sign in
-        const signUpBtn = document.getElementById('signup-btn'); // For navbar sign up
+        const signInBtn = document.getElementById('signin-btn');
+        const signUpBtn = document.getElementById('signup-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const showSigninTab = document.getElementById('show-signin-tab');
         const showSignupTab = document.getElementById('show-signup-tab');
         const signinForm = document.getElementById('signin-form');
         const signupForm = document.getElementById('signup-form');
-        const switchToSigninLink1 = document.getElementById('switch-to-signin-link'); // from signup form (if added)
-        const switchToSigninLink2 = document.getElementById('switch-to-signin-link-2'); // from signup form
+        const switchToSignupLink = document.getElementById('switch-to-signup-link');
+        const switchToSigninLink = document.getElementById('switch-to-signin-link-2');
 
         const openModal = () => authModalOverlay.classList.add('show');
         const closeModal = () => authModalOverlay.classList.remove('show');
 
         const showForm = (formToShow, tabToActivate) => {
             if (signinForm && signupForm && showSigninTab && showSignupTab) {
-                // Clear messages when switching forms
                 document.querySelectorAll('.auth-message').forEach(msg => msg.textContent = '');
-
                 signinForm.classList.remove('active');
                 signupForm.classList.remove('active');
                 showSigninTab.classList.remove('active');
@@ -90,161 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
         authModalOverlay.addEventListener('click', (e) => { if (e.target === authModalOverlay) closeModal(); });
         if (showSigninTab) showSigninTab.addEventListener('click', () => showForm(signinForm, showSigninTab));
         if (showSignupTab) showSignupTab.addEventListener('click', () => showForm(signupForm, showSignupTab));
-        if (switchToSigninLink1) switchToSigninLink1.addEventListener('click', (e) => { e.preventDefault(); showForm(signinForm, showSigninTab); });
-        if (switchToSigninLink2) switchToSigninLink2.addEventListener('click', (e) => { e.preventDefault(); showForm(signinForm, showSigninTab); });
+        if (switchToSignupLink) switchToSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm, showSignupTab); });
+        if (switchToSigninLink) switchToSigninLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signinForm, showSigninTab); });
+    }
 
-
-        // --- AUTH API LOGIC (NEW) ---
-        const signinMessageDiv = document.getElementById('signin-message');
-        const signupMessageDiv = document.getElementById('signup-message');
-        const navAuthButtons = document.getElementById('nav-auth-buttons');
-        const navUserInfo = document.getElementById('nav-user-info');
-        const userDisplayName = document.getElementById('user-display-name');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        const API_AUTH_BASE_URL = 'http://127.0.0.1:8000'; // Auth routes are directly on root
-
-        // Function to update UI based on login status
-        const updateAuthUI = async () => {
-            const token = localStorage.getItem('access_token');
-            if (token) {
-                // Try to fetch user details to verify token
-                try {
-                    const response = await fetch(`${API_AUTH_BASE_URL}/users/me/`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (response.ok) {
-                        const user = await response.json();
-                        userDisplayName.textContent = `Hi, ${user.full_name.split(' ')[0]}!`;
-                        navAuthButtons.style.display = 'none';
-                        navUserInfo.style.display = 'flex';
-                    } else {
-                        // Token invalid or expired, log out
-                        console.error('Token invalid or expired, logging out.');
-                        localStorage.removeItem('access_token');
-                        navAuthButtons.style.display = 'flex';
-                        navUserInfo.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error verifying token:', error);
-                    localStorage.removeItem('access_token');
-                    navAuthButtons.style.display = 'flex';
-                    navUserInfo.style.display = 'none';
-                }
-            } else {
-                navAuthButtons.style.display = 'flex';
-                navUserInfo.style.display = 'none';
-            }
-        };
-
-        // Call on page load
-        updateAuthUI();
-
-        // Handle Sign In form submission
-        if (signinForm) {
-            signinForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                signinMessageDiv.textContent = 'Logging in...';
-                signinMessageDiv.style.color = 'blue';
-
-                const formData = new URLSearchParams();
-                formData.append('username', document.getElementById('signin-email').value);
-                formData.append('password', document.getElementById('signin-password').value);
-
-                try {
-                    const response = await fetch(`${API_AUTH_BASE_URL}/token`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded' // Crucial for OAuth2PasswordRequestForm
-                        },
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        localStorage.setItem('access_token', data.access_token);
-                        signinMessageDiv.textContent = 'Login successful!';
-                        signinMessageDiv.style.color = 'green';
-                        setTimeout(() => {
-                            closeModal();
-                            updateAuthUI(); // Update UI after successful login
-                            // Optional: Redirect to a dashboard or refresh current page
-                            // window.location.reload(); 
-                        }, 1000);
-                    } else {
-                        const errorData = await response.json();
-                        signinMessageDiv.textContent = `Error: ${errorData.detail || response.statusText}`;
-                        signinMessageDiv.style.color = 'red';
-                    }
-                } catch (error) {
-                    console.error('Network error during login:', error);
-                    signinMessageDiv.textContent = 'Network error. Please try again.';
-                    signinMessageDiv.style.color = 'red';
-                }
-            });
-        }
-
-        // Handle Sign Up form submission
-        if (signupForm) {
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                signupMessageDiv.textContent = 'Registering...';
-                signupMessageDiv.style.color = 'blue';
-
-                const full_name = document.getElementById('signup-fullname').value;
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-
-                try {
-                    const response = await fetch(`${API_AUTH_BASE_URL}/register`, { // Changed to /register
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ full_name, email, password })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        signupMessageDiv.textContent = `Registration successful! You can now log in.`;
-                        signupMessageDiv.style.color = 'green';
-                        // Optionally switch to login tab after successful registration
-                        setTimeout(() => {
-                            showForm(signinForm, showSigninTab);
-                            document.getElementById('signin-email').value = email; // Pre-fill login email
-                            document.getElementById('signin-message').textContent = ''; // Clear login message
-                        }, 1500);
-                    } else {
-                        const errorData = await response.json();
-                        signupMessageDiv.textContent = `Error: ${errorData.detail || response.statusText}`;
-                        signupMessageDiv.style.color = 'red';
-                    }
-                } catch (error) {
-                    console.error('Network error during registration:', error);
-                    signupMessageDiv.textContent = 'Network error. Please try again.';
-                    signupMessageDiv.style.color = 'red';
-                }
-            });
-        }
-
-        // Handle Logout
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('access_token');
-                updateAuthUI();
-                alert('You have been logged out.'); // Simple feedback
-                // Optional: Redirect to homepage or refresh
-                // window.location.href = 'index.html'; 
-            });
-        }
-
-
-    } // End of Auth Modal Logic
-
-
-    // --- CHATBOT LOGIC ---
+    // --- CHATBOT UI ---
     const chatbotFab = document.getElementById('chatbot-fab');
     if (chatbotFab) {
         const chatbotPopup = document.getElementById('chatbot-popup');
@@ -263,17 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
             chatbotBody.appendChild(messageDiv);
             chatbotBody.scrollTop = chatbotBody.scrollHeight;
         };
-
-        const getBotResponse = (userInput) => {
-            const lcInput = userInput.toLowerCase();
-            if (lcInput.includes('hello') || lcInput.includes('hi')) return "Hi there! How can I assist you with your solar needs?";
-            if (lcInput.includes('solar ai')) return "SolarAI uses AI to determine the best placement for your solar panels, maximizing energy generation.";
-            if (lcInput.includes('pricing') || lcInput.includes('cost')) return "Our pricing varies. For a personalized quote, use the SolarPay tool.";
-            if (lcInput.includes('subsidy') || lcInput.includes('subsidies')) return "SolarPay automatically checks for eligible government subsidies when you enter your details.";
-            if (lcInput.includes('thank')) return "You're welcome! Is there anything else I can help you with?";
-            return "I'm sorry, I'm not sure. You can try asking about 'pricing', 'Solar AI', or 'subsidies'.";
-        };
-
         const handleSendMessage = () => {
             const userInput = chatbotInput.value.trim();
             if (userInput === '') return;
@@ -281,322 +103,277 @@ document.addEventListener('DOMContentLoaded', () => {
             chatbotInput.value = '';
             setTimeout(() => addMessage(getBotResponse(userInput), 'bot'), 1000);
         };
-
+        const getBotResponse = (input) => {
+            const lcInput = input.toLowerCase();
+            if (lcInput.includes('hello') || lcInput.includes('hi')) return "Hi there! How can I assist you?";
+            if (lcInput.includes('solar ai')) return "SolarAI helps find the best placement for solar panels using AI analysis.";
+            if (lcInput.includes('pricing') || lcInput.includes('cost')) return "Use the SolarPay tool for a personalized financial quote and subsidy information.";
+            if (lcInput.includes('subsidy')) return "SolarPay automatically checks government subsidies for you.";
+            if (lcInput.includes('thank')) return "You're welcome! Let me know if you need anything else.";
+            return "I'm not sure about that. Try asking about 'pricing', 'Solar AI', or 'subsidies'.";
+        };
         if (chatbotSendBtn) chatbotSendBtn.addEventListener('click', handleSendMessage);
         if (chatbotInput) chatbotInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSendMessage(); });
     }
 
-    // --- Product Card Fade-in on Scroll (Index Page Only) ---
+    // --- PRODUCT CARD FADE-IN ---
     const productCards = document.querySelectorAll('.product-card');
     if (productCards.length > 0) {
-        const observerOptions = {
-            root: null, // relative to the viewport
-            rootMargin: '0px',
-            threshold: 0.1 // 10% of the item visible
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('visible'); // Adds 'visible' class
-                    observer.unobserve(entry.target); // Stop observing once visible
+                    entry.target.classList.add('visible');
+                    obs.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
+        productCards.forEach(card => observer.observe(card));
+    }
 
-        productCards.forEach(card => {
-            observer.observe(card);
+
+    // ===================================================================
+    // SECTION 2: API & BACKEND LOGIC (FOR LOCAL SERVER)
+    // ===================================================================
+
+    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const API_TOOLS_URL = `${API_BASE_URL}/api/tools`;
+
+    // --- AUTHENTICATION API LOGIC ---
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+    const signinMessageDiv = document.getElementById('signin-message');
+    const signupMessageDiv = document.getElementById('signup-message');
+    const navAuthButtons = document.getElementById('nav-auth-buttons');
+    const navUserInfo = document.getElementById('nav-user-info');
+    const userDisplayName = document.getElementById('user-display-name');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    const updateAuthUI = async () => {
+        const token = localStorage.getItem('access_token');
+        if (!navAuthButtons || !navUserInfo) return;
+
+        if (token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/me/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const user = await response.json();
+                    userDisplayName.textContent = `Hi, ${user.full_name.split(' ')[0]}!`;
+                    navAuthButtons.style.display = 'none';
+                    navUserInfo.style.display = 'flex';
+                } else {
+                    localStorage.removeItem('access_token');
+                    navAuthButtons.style.display = 'flex';
+                    navUserInfo.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                navAuthButtons.style.display = 'flex';
+                navUserInfo.style.display = 'none';
+            }
+        } else {
+            navAuthButtons.style.display = 'flex';
+            navUserInfo.style.display = 'none';
+        }
+    };
+    updateAuthUI();
+
+    if (signinForm) {
+        signinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signinMessageDiv.textContent = 'Logging in...';
+            const formData = new URLSearchParams(new FormData(signinForm));
+            try {
+                const response = await fetch(`${API_BASE_URL}/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Login failed');
+                localStorage.setItem('access_token', data.access_token);
+                signinMessageDiv.textContent = 'Login successful!';
+                setTimeout(() => {
+                    document.getElementById('close-modal-btn')?.click();
+                    updateAuthUI();
+                }, 1000);
+            } catch (error) {
+                signinMessageDiv.textContent = `Error: ${error.message}`;
+            }
         });
     }
 
-    // ===================================================================
-    // SECTION 2: API-DRIVEN TOOL LOGIC
-    // This code connects the tool pages to the backend API.
-    // ===================================================================
-
-    // Note: API_BASE_URL for tools includes /api, but auth routes are directly on root
-    const API_TOOLS_BASE_URL = 'http://127.0.0.1:8000/api/tools'; 
-
-    // --- SOLAR PAY CALCULATOR LOGIC ---
-    const solarPayForm = document.getElementById('solar-pay-form');
-    if (solarPayForm) {
-        const resultsContainer = document.getElementById('results-container'); 
-
-        resultsContainer.innerHTML = '<p>Enter your system details and monthly bill above and click "Calculate Savings" to get a financial estimate.</p>';
-
-        solarPayForm.addEventListener('submit', async (e) => {
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            resultsContainer.innerHTML = '<p>Calculating...</p>'; 
-
-            const systemSizeKw = parseFloat(document.getElementById('system-size').value);
-            const state = document.getElementById('state').value;
-            const monthlyBillInr = parseFloat(document.getElementById('monthly-bill').value);
-
-            if (isNaN(systemSizeKw) || systemSizeKw <= 0) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter a valid positive number for System Size (kW).</p>';
-                return;
-            }
-            if (!state) { 
-                resultsContainer.innerHTML = '<p style="color: red;">Please select your State.</p>';
-                return;
-            }
-            if (isNaN(monthlyBillInr) || monthlyBillInr <= 0) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter a valid positive number for Average Monthly Electricity Bill.</p>';
-                return;
-            }
-
-            const requestData = {
-                system_size_kw: systemSizeKw,
-                state: state,
-                monthly_bill_inr: monthlyBillInr
+            signupMessageDiv.textContent = 'Registering...';
+            const payload = {
+                full_name: document.getElementById('signup-fullname').value,
+                email: document.getElementById('signup-email').value,
+                password: document.getElementById('signup-password').value
             };
-
             try {
-                const response = await fetch(`${API_TOOLS_BASE_URL}/solar-pay`, {
+                const response = await fetch(`${API_BASE_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestData)
+                    body: JSON.stringify(payload)
                 });
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Server returned an error: ${errorData.detail || response.statusText}`);
-                }
                 const data = await response.json();
-                resultsContainer.innerHTML = `
-                    <h3>Calculation Results:</h3>
-                    <ul>
-                        <li><strong>Total Estimated Cost:</strong> ₹${data.total_cost.toLocaleString('en-IN')}</li>
-                        <li><strong>Government Subsidy:</strong> ₹${data.subsidy_amount.toLocaleString('en-IN')}</li>
-                        <li><strong>Your Final Cost:</strong> ₹${data.final_cost.toLocaleString('en-IN')}</li>
-                        <li><strong>Estimated Annual Savings:</strong> ₹${data.annual_savings.toLocaleString('en-IN')}</li>
-                        <li><strong>Payback Period:</strong> ${data.payback_period_years} years</li>
-                        ${data.loan_emi_per_month ? `<li><strong>Estimated Loan EMI per month:</strong> ₹${data.loan_emi_per_month.toLocaleString('en-IN')}</li>` : ''}
-                    </ul>`;
+                if (!response.ok) throw new Error(data.detail || 'Registration failed');
+                signupMessageDiv.textContent = 'Registration successful! You can now log in.';
+                setTimeout(() => {
+                    document.getElementById('show-signin-tab')?.click();
+                    document.getElementById('signin-email').value = payload.email;
+                }, 1500);
             } catch (error) {
-                resultsContainer.innerHTML = `<p style="color: red;">Error: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
+                signupMessageDiv.textContent = `Error: ${error.message}`;
             }
         });
     }
 
-    // --- ECO METER LOGIC ---
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('access_token');
+            updateAuthUI();
+            alert('You have been logged out.');
+        });
+    }
+
+    // --- ALL TOOLS API LOGIC ---
+
+    // Generic error handler for tool forms
+    const handleToolError = (container, error) => {
+        container.innerHTML = `<p style="color: red;"><b>Error:</b> Could not connect to the backend. <br>Please ensure your local server is running at <b>${API_BASE_URL}</b>.<br><small>(${error.message})</small></p>`;
+    };
+
+    // --- SOLAR PAY ---
+    const solarPayForm = document.getElementById('solar-pay-form');
+    if (solarPayForm) {
+        const results = document.getElementById('results-container');
+        solarPayForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            results.innerHTML = '<p>Calculating...</p>';
+            const payload = {
+                system_size_kw: parseFloat(document.getElementById('system-size').value),
+                state: document.getElementById('state').value,
+                monthly_bill_inr: parseFloat(document.getElementById('monthly-bill').value)
+            };
+            try {
+                const response = await fetch(`${API_TOOLS_URL}/solar-pay`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                results.innerHTML = `<h3>Calculation Results:</h3><ul><li><strong>Total Estimated Cost:</strong> ₹${data.total_cost.toLocaleString('en-IN')}</li><li><strong>Government Subsidy:</strong> ₹${data.subsidy_amount.toLocaleString('en-IN')}</li><li><strong>Your Final Cost:</strong> ₹${data.final_cost.toLocaleString('en-IN')}</li><li><strong>Annual Savings:</strong> ₹${data.annual_savings.toLocaleString('en-IN')}</li><li><strong>Payback Period:</strong> ${data.payback_period_years} years</li></ul>`;
+            } catch (err) { handleToolError(results, err); }
+        });
+    }
+
+    // --- ECO METER ---
     const ecoMeterForm = document.getElementById('eco-meter-form');
     if (ecoMeterForm) {
-        const resultsContainer = document.getElementById('eco-meter-results'); 
-
-        resultsContainer.innerHTML = '<p>Enter your monthly solar generation above and click "Track Impact" to see your environmental contribution.</p>';
-
+        const results = document.getElementById('eco-meter-results');
         ecoMeterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            resultsContainer.innerHTML = '<p>Calculating Impact...</p>'; 
-
-            const kwh = parseFloat(document.getElementById('kwh-generated').value);
-
-            if (isNaN(kwh) || kwh <= 0) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter a valid positive number for monthly kWh generated.</p>';
-                return;
-            }
-
-            const apiUrl = `${API_TOOLS_BASE_URL}/eco-meter?kwh_generated_monthly=${kwh}`;
+            results.innerHTML = '<p>Calculating Impact...</p>';
+            const kwh = document.getElementById('kwh-generated').value;
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Server returned an error: ${errorData.detail || response.statusText}`);
-                }
+                const response = await fetch(`${API_TOOLS_URL}/eco-meter?kwh_generated_monthly=${kwh}`);
                 const data = await response.json();
-                resultsContainer.innerHTML = `
-                    <h3>Your Monthly Green Impact:</h3>
-                    <ul>
-                        <li><strong>CO₂ Offset:</strong> ${data.co2_offset_monthly_kg} kg</li>
-                        <li><strong>Yearly CO₂ Offset:</strong> ${data.co2_offset_yearly_tonnes} tonnes</li>
-                        <li><strong>Equivalent to Planting:</strong> ${data.equivalent_trees_planted} trees</li>
-                    </ul>
-                    <p>${data.dashboard_message}</p>`;
-            } catch (error) {
-                resultsContainer.innerHTML = `<p style="color: red;">Error: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
-            }
+                if (!response.ok) throw new Error(data.detail);
+                results.innerHTML = `<h3>Your Green Impact:</h3><ul><li><strong>CO₂ Offset (Monthly):</strong> ${data.co2_offset_monthly_kg} kg</li><li><strong>Equivalent Trees Planted:</strong> ${data.equivalent_trees_planted}</li></ul><p>${data.dashboard_message}</p>`;
+            } catch (err) { handleToolError(results, err); }
         });
     }
 
-    // --- GREEN CELL LOGIC ---
+    // --- GREEN CELL ---
     const greenCellForm = document.getElementById('green-cell-form');
     if (greenCellForm) {
-        const resultsContainer = document.getElementById('green-cell-results'); 
-
-        resultsContainer.innerHTML = '<p>Enter your battery details above and click "Analyze Battery" to get a health report.</p>';
-
+        const results = document.getElementById('green-cell-results');
         greenCellForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            resultsContainer.innerHTML = '<p>Analyzing Battery...</p>'; 
-
-            const capacity = parseFloat(document.getElementById('capacity-ah').value);
-            const cycles = parseFloat(document.getElementById('current-cycles').value);
-            const dod = parseFloat(document.getElementById('avg-dod').value);
-
-            if (isNaN(capacity) || capacity <= 0 || isNaN(cycles) || cycles < 0 || isNaN(dod) || dod < 0 || dod > 100) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter valid numbers for all fields. Capacity and DOD should be positive, Cycles non-negative, and DOD between 0-100.</p>';
-                return;
-            }
-
-            const apiUrl = `${API_TOOLS_BASE_URL}/green-cell?capacity_ah=${capacity}&current_cycles=${cycles}&avg_dod_percent=${dod}`;
+            results.innerHTML = '<p>Analyzing Battery...</p>';
+            const params = new URLSearchParams({
+                capacity_ah: document.getElementById('capacity-ah').value,
+                current_cycles: document.getElementById('current-cycles').value,
+                avg_dod_percent: document.getElementById('avg-dod').value
+            }).toString();
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Server returned an error: ${errorData.detail || response.statusText}`);
-                }
+                const response = await fetch(`${API_TOOLS_URL}/green-cell?${params}`);
                 const data = await response.json();
-                resultsContainer.innerHTML = `
-                    <h3>Battery Health Report:</h3>
-                    <ul>
-                        <li><strong>Current Health:</strong> ${data.current_health_percent}%</li>
-                        <li><strong>Estimated Remaining Cycles:</strong> ${data.estimated_remaining_cycles}</li>
-                        <li><strong>Charge Efficiency:</strong> ${data.current_charge_efficiency_percent}%</li>
-                        <li><strong>Maintenance Alert:</strong> <span style="font-weight: bold;">${data.maintenance_alert}</span></li>
-                    </ul>`;
-            } catch (error) {
-                resultsContainer.innerHTML = `<p style="color: red;">Error: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
-            }
+                if (!response.ok) throw new Error(data.detail);
+                results.innerHTML = `<h3>Battery Health Report:</h3><ul><li><strong>Health:</strong> ${data.current_health_percent}%</li><li><strong>Remaining Cycles:</strong> ${data.estimated_remaining_cycles}</li><li><strong>Efficiency:</strong> ${data.current_charge_efficiency_percent}%</li><li><strong>Alert:</strong> ${data.maintenance_alert}</li></ul>`;
+            } catch (err) { handleToolError(results, err); }
         });
     }
 
-    // --- AGRI SOLAR LOGIC (Now interactive with user input) ---
+    // --- AGRI SOLAR ---
     const agriSolarForm = document.getElementById('agri-solar-form');
-    const agriSolarResults = document.getElementById('agri-solar-results'); 
-
-    if (agriSolarForm && agriSolarResults) {
-        agriSolarResults.innerHTML = '<p>Enter your details above and click "Get Advice" to see smart irrigation recommendations.</p>';
-
+    if (agriSolarForm) {
+        const results = document.getElementById('agri-solar-results');
         agriSolarForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-
-            const pumpHp = document.getElementById('pump-hp').value;
-            const cropType = document.getElementById('crop-type').value;
-
-            if (!pumpHp || !cropType || isNaN(pumpHp) || parseInt(pumpHp) <= 0) {
-                agriSolarResults.innerHTML = '<p style="color: red;">Please enter valid pump horsepower (a positive number) and crop type.</p>';
-                return;
-            }
-
-            const apiUrl = `${API_TOOLS_BASE_URL}/agri-solar?pump_hp=${pumpHp}&crop_type=${encodeURIComponent(cropType)}`;
-
+            e.preventDefault();
+            results.innerHTML = '<p>Getting Advice...</p>';
+            const params = new URLSearchParams({
+                pump_hp: document.getElementById('pump-hp').value,
+                crop_type: document.getElementById('crop-type').value
+            }).toString();
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Server returned an error: ${errorData.detail || response.statusText}`);
-                }
-                const data = await response.json(); 
-
-                agriSolarResults.innerHTML = `
-                    <p><strong>Weather Forecast:</strong> ${data.weather_prediction}</p>
-                    <p style="font-size: 1.1rem; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 10px;"><em>${data.irrigation_advice}</em></p>
-                `;
-            } catch (error) {
-                agriSolarResults.innerHTML = `<p style="color: red;">Error generating advice: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
-            }
+                const response = await fetch(`${API_TOOLS_URL}/agri-solar?${params}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                results.innerHTML = `<p><strong>Weather:</strong> ${data.weather_prediction}</p><p><em>${data.irrigation_advice}</em></p>`;
+            } catch (err) { handleToolError(results, err); }
         });
     }
 
-    // --- SOLAR AI LOGIC ---
+    // --- SOLAR AI ---
     const solarAiForm = document.getElementById('solar-ai-form');
     if (solarAiForm) {
-        const resultsContainer = document.getElementById('solar-ai-results'); 
-
-        resultsContainer.innerHTML = '<p>Enter your pincode and available roof area above and click "Analyze Potential" to get AI-driven recommendations.</p>';
-
+        const results = document.getElementById('solar-ai-results');
         solarAiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            resultsContainer.innerHTML = '<p>AI is Analyzing...</p>';
-
-            const pincode = document.getElementById('pincode').value;
-            const roofArea = parseFloat(document.getElementById('roof-area').value);
-
-            const pincodeRegex = /^[1-9][0-9]{5}$/;
-            if (!pincodeRegex.test(pincode)) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter a valid 6-digit Indian Pincode (e.g., 400001).</p>';
-                return;
-            }
-            if (isNaN(roofArea) || roofArea <= 50) {
-                resultsContainer.innerHTML = '<p style="color: red;">Please enter a valid roof area (a number greater than 50 sq. ft.).</p>';
-                return;
-            }
-
-            const apiUrl = `${API_TOOLS_BASE_URL}/solar-ai?pincode=${pincode}&roof_area_sqft=${roofArea}`;
+            results.innerHTML = '<p>AI is Analyzing...</p>';
+            const params = new URLSearchParams({
+                pincode: document.getElementById('pincode').value,
+                roof_area_sqft: document.getElementById('roof-area').value
+            }).toString();
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Server returned an error: ${errorData.detail || response.statusText}`);
-                }
+                const response = await fetch(`${API_TOOLS_URL}/solar-ai?${params}`);
                 const data = await response.json();
-                resultsContainer.innerHTML = `
-                    <h3>AI Roof Analysis Report:</h3>
-                    <ul>
-                        <li><strong>Max Installable Capacity:</strong> ${data.recommendations.max_installable_capacity_kw} kW</li>
-                        <li><strong>Optimal Panel Orientation:</strong> ${data.recommendations.optimal_panel_orientation}</li>
-                        <li><strong>Recommended Tilt Angle:</strong> ${data.recommendations.recommended_tilt_angle_degrees}°</li>
-                    </ul>
-                    <h4>Projections:</h4>
-                    <ul>
-                        <li><strong>Avg. Daily Sunlight:</strong> ${data.projections.avg_daily_sunlight_hours} hours</li>
-                        <li><strong>Estimated Efficiency:</strong> ${data.projections.estimated_generation_efficiency_percent}%</li>
-                    </ul>`;
-            } catch (error) {
-                resultsContainer.innerHTML = `<p style="color: red;">Error: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
-            }
+                if (!response.ok) throw new Error(data.detail);
+                results.innerHTML = `<h3>AI Analysis Report:</h3><ul><li><strong>Max Capacity:</strong> ${data.recommendations.max_installable_capacity_kw} kW</li><li><strong>Orientation:</strong> ${data.recommendations.optimal_panel_orientation}</li><li><strong>Tilt Angle:</strong> ${data.recommendations.recommended_tilt_angle_degrees}°</li></ul>`;
+            } catch (err) { handleToolError(results, err); }
         });
     }
-
-    // --- SOLAR ED LOGIC ---
+    
+    // --- SOLAR ED ---
     const solarEdTool = document.getElementById('solar-ed-tool');
     if (solarEdTool) {
         const contentContainer = document.getElementById('solar-ed-content');
         const topicButtons = document.querySelectorAll('.topic-btn');
-
         const loadTopicContent = async (topic) => {
-            contentContainer.innerHTML = '<p>Loading content...</p>'; 
+            contentContainer.innerHTML = '<p>Loading content...</p>';
+            contentContainer.style.textAlign = 'center';
             topicButtons.forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.querySelector(`.topic-btn[data-topic="${topic}"]`);
             if (activeBtn) activeBtn.classList.add('active');
 
-            const apiUrl = `${API_TOOLS_BASE_URL}/solar-ed?topic=${topic}`;
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    const errorData = await response.json(); 
-                    throw new Error(`Topic not found or server error: ${errorData.detail || response.statusText}`);
-                }
+                const response = await fetch(`${API_TOOLS_URL}/solar-ed?topic=${topic}`);
                 const data = await response.json();
-                const linkHtml = data.link ? `<p><a href="${data.link}" target="_blank" rel="noopener noreferrer">Learn More on the Official Portal →</a></p>` : '';
-                contentContainer.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <p>${data.content}</p>
-                    ${linkHtml}`;
-                contentContainer.style.justifyContent = 'flex-start';
-                contentContainer.style.alignItems = 'flex-start';
-                contentContainer.style.textAlign = 'inherit'; 
-
-            } catch (error) {
-                contentContainer.innerHTML = `<p style="color: red;">Error: Could not connect to backend or ${error.message}. <br>Please ensure your backend server is running at ${API_TOOLS_BASE_URL}.</p>`;
-                contentContainer.style.justifyContent = 'center';
-                contentContainer.style.alignItems = 'center';
-                contentContainer.style.textAlign = 'center';
-            }
+                if (!response.ok) throw new Error(data.detail);
+                const linkHtml = data.link ? `<p><a href="${data.link}" target="_blank" rel="noopener noreferrer">Learn More →</a></p>` : '';
+                contentContainer.style.textAlign = 'left';
+                contentContainer.innerHTML = `<h3>${data.title}</h3><p>${data.content}</p>${linkHtml}`;
+            } catch (err) { handleToolError(contentContainer, err); }
         };
 
         topicButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const topic = button.dataset.topic;
-                loadTopicContent(topic);
-            });
+            button.addEventListener('click', () => loadTopicContent(button.dataset.topic));
         });
-
-        if (topicButtons.length > 0) {
-            loadTopicContent('subsidies'); 
-        } else {
-            contentContainer.innerHTML = '<p style="color: red;">No educational topics available.</p>';
-        }
     }
-
-}); 
+});
