@@ -4,11 +4,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
 # Load the database URL from an environment variable.
-# Vercel will provide this value from the environment variable you set in the dashboard.
-SQLALCHEMY_DATABASE_URL = os.environ.get("postgresql://neondb_owner:npg_Ugx7NCKWJvc8@ep-long-dust-a17kuf8n-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require")
+# The key here must be the name of the variable, which is "DATABASE_URL".
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
 
 # Raise an error if the environment variable is not set.
-# This ensures you don't accidentally deploy without a database.
 if not SQLALCHEMY_DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set.")
 
