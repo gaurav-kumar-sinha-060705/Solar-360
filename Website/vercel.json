@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*\\.(?:css|js|html|ico|png|jpg|jpeg|gif|svg))$",
-      "dest": "frontend/$1"
+      "dest": "Frontend/$1"
     },
     {
       "src": "/(.*)",
