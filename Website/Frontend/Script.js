@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // SECTION 2: API & BACKEND LOGIC (FOR LOCAL SERVER)
     // ===================================================================
 
-    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const API_BASE_URL = '';
     const API_TOOLS_URL = `${API_BASE_URL}/api/tools`;
 
     // --- AUTHENTICATION API LOGIC ---
@@ -377,3 +377,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
