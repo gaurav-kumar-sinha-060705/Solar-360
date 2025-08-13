@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/(.*\\.(?:css|js|html|ico|png|jpg|jpeg|gif|svg))$",
+      "dest": "frontend/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "Backend/app/main.py"
     }
